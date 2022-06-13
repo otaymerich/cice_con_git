@@ -106,8 +106,24 @@ def benford_4():
             
         
 
-plt.style.use('_mpl-gallery')
-fig, ax = plt.subplots()
-ax.bar(range(1,10), benford_4().values(), width=1, edgecolor="white", linewidth=0.7)
-plt.show()
-# plt.savefig("charge.png")
+# plt.style.use('_mpl-gallery')
+# fig, ax = plt.subplots()
+# ax.bar(range(1,10), benford_4().values(), width=1, edgecolor="white", linewidth=0.7)
+# plt.show()
+# # plt.savefig("charge.png")
+
+pob = sum(map(lambda dic: dic["densidad_por_km2"]*dic["superficie_km2"], data))
+# print(pob)
+
+def count_pob(dic):
+    return dic["densidad_por_km2"]*dic["superficie_km2"]
+
+pob_1 = sum(map(lambda dic: count_pob(dic), data))
+# print(pob_1)
+
+sor = sorted(data, key=lambda mun: mun["superficie_km2"], reverse=True)
+sor = sor[0:10]
+print(sor)
+print(len(sor))
+dat = list(map(lambda sup: sup["superficie_km2"], sor))
+print(dat)
