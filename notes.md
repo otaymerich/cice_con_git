@@ -152,6 +152,16 @@ git pull origin develop #para actualizar contenido, en caso que haya habido modi
 *Resolucion de conflicotos en git (comparar ambas versiones y decidir cual es la correcta)
 5. git push oring <branch>
 
+#### Entorno virtual con git
+
+No subimos nunca entorno virtual en git, subimos lista de requisitos para crear entorno, es decir el resultado que obtenemos al hacer comando pip freeze
+```bash
+pip freeze > requirements.txt #Guradamos todas las librerias del entorno virtual
+```
+De este modo con este archivo podemos instalar todos las librerias en un nuevo ordenador o carpeta o en caso de perdiada para recrear el entorno virtual.
+```bash
+pip install -r requirements.txt
+```
 
 #### Otros comandos bash
 
@@ -363,3 +373,6 @@ Si queremos eliminar carpeta virtual:
 ```bash
 rm venv/ -r
 ```
+
+
+
