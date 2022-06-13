@@ -93,11 +93,21 @@ def benford_3():
         except KeyError:
             provab[first_dig] = 100/len(data)
     return provab
+
+def benford_4():
+    provab = {}
+    for mun in data:
+        first_dig = str(mun["densidad_por_km2"])[0]
+        if provab.get(first_dig):
+            provab[first_dig] += 100/len(data)
+        else:
+            provab[first_dig] = 100/len(data)
+    return provab
             
         
 
 plt.style.use('_mpl-gallery')
 fig, ax = plt.subplots()
-ax.bar(range(1,10), benford_3().values(), width=1, edgecolor="white", linewidth=0.7)
+ax.bar(range(1,10), benford_4().values(), width=1, edgecolor="white", linewidth=0.7)
 plt.show()
 # plt.savefig("charge.png")
