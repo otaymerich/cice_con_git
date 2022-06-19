@@ -1,6 +1,4 @@
 from os import mkdir, getcwd, stat, system
-from types import NoneType
-from typing import Any
 import requests as req
 import random
 from typing import Union, Tuple
@@ -8,22 +6,20 @@ from typing import Union, Tuple
 CWD = getcwd()
 url = "https://restcountries.com/v3.1"
 
-#coje todos los paises
+# coje todos los paises
 def get_all() -> Tuple[list, str]: 
     res = req.get(url + "/all").json()
     return res, url
-print(type(get_all()))
-input()
 
 '''
 FRONT
 '''
-#limpiamos terminal manteniendo menu
+# limpiamos terminal manteniendo menu
 def clear(): 
     system("clear")
     menu()
 
-#imprime menu
+# imprime menu
 def menu():
     print("\n")
     print("Countires".center(50, "-"))
@@ -32,8 +28,8 @@ def menu():
     print("Q. Exit".center(50))
     print("".center(50, "-"))
 
-#impresion de busqueda de pais
-def info(data: dict, country: str) -> bool: 
+# impresion de busqueda de pais
+def info(data: Union[dict, None], country: str) -> bool: 
     if data == None:  #si no encontramos pais buscamos posibles similitudes
         if len(guess(country)) > 0: 
             aprox = guess(country)
@@ -46,12 +42,12 @@ def info(data: dict, country: str) -> bool:
         print(f"\n{name(data)}\n") #si encontramos pais imprimimos informacion
         return True
 
-#listamos los continentes
-def continent_choises(regions):
+# listamos los continentes
+def continent_choises(regions: list):
     for k, cont in enumerate(regions,start=1):
         print(f'''{k}: {cont}''')
 
-#imprimimos pregunta, posibles respuestas y evaluamos la respuesta que da el usuario. Devolvemos puntuación
+# imprimimos pregunta, posibles respuestas y evaluamos la respuesta que da el usuario. Devolvemos puntuación
 def questions(question: str, answers: list, correct_answer: str) -> int:
     print(question) #imprimimos pregunta
     for k, ans in enumerate(answers, start=1): #imprimimos posibles respuestas
@@ -72,7 +68,7 @@ def questions(question: str, answers: list, correct_answer: str) -> int:
         print("\nThe answer is not valid, therefore you got 0 points in this question\n")
         return 0
 
-#damos puntuación
+# damos puntuación
 def result(points: int):
     if points >= 5:
         print(f"Congrats you got {points}/10.")
@@ -84,15 +80,15 @@ def result(points: int):
 '''
 BACK
 '''
-#Checks if the country exists, returns the country dic if yes or None if not
-def exist_country(country: str) -> Union[dict, NoneType]:
+# Checks if the country exists, returns the country dic if yes or None if not
+def exist_country(country: str) -> Union[dict, None]:
     try:
         data = req.get(f"{url}/name/{country}?fullText=true").json()[0]
         return data
     except KeyError:
         return None
 
-#When the country is not found tries to make an educated guess of the country the user meant (not working so good yet)
+# When the country is not found tries to make an educated guess of the country the user meant (not working so good yet)
 def guess(country: str) -> str:
     maybe = []
     for data in get_all()[0]:
@@ -115,35 +111,44 @@ def guess(country: str) -> str:
         coun_maybe = "Not found"
     return coun_maybe
 
-#Gets all the required information about a country
+# Gets all the required information about a country
 def name(data: dict) -> str:
-    try:
+    if "capital" in data.keys():
         capital = data["capital"][0]
-    except KeyError:
-        capital = "No hay capital"
+    else:
+        capital = "There is no capital"
+    # try:
+    #     capital = data["capital"][0]
+    # except KeyError:
+    #     capital = "No hay capital"
     population = data["population"]
     area = data["area"]
-    try:
+    if "languages" in data.keys():
         language = ", ".join([leng for leng in data["languages"].values()])
-    except KeyError:
-        language = "No hay lengua própia"
+    else:
+        language = "No language"
+    # try:
+    #     language = ", ".join([leng for leng in data["languages"].values()])
+    # except KeyError:
+    #     language = "No hay lengua própia"
     info = f"Capital: {capital}\nPopulation: {population}\nArea: {area}\nLenguage: {language}"
     return info
 
-#saves the flag of the country in the dir flags
-def bandera(country: str, flag_im: str, img_format: str):
-    try: #crea directorio en caso que no este
+# downloads the flag of the country in the dir flags
+def bandera(country: str, flag_im, img_format: str): #HOW TO SHOW REQUESTS TYPE
+    try: # creates the directory in case it dosen't exist
         mkdir(f"{CWD}/flags")
     except FileExistsError:
         pass
     open(f'''{CWD}/flags/{country}.{img_format}''', "wb").write(flag_im.content)
 
-
-def count_in_continent(continent):
+# Given a continent return the lsit of countries in that continent
+def count_in_continent(continent: str) -> list:
     list_countries = req.get(f"{url}/region/{continent}").json()
     return list_countries
 
-def numerical(list_countries, request):
+# Creates the question and the possible answers for the numerical questions (the corretc answer is always the first value of the list answers)
+def numerical(list_countries: list, request: str) -> Tuple[str, list]:
     if request == "area":
         quest = "Whats the biggest country of the continent?"
     else:
@@ -154,39 +159,36 @@ def numerical(list_countries, request):
     [answers.append(list_countries[q]["name"]["common"]) for q in random_list]
     return quest, answers
 
-def capital(list_countries):
+# Creates the question and the possible answers for capital guessing the capital of a random country (the corretc answer is always the first value of the list answers)
+def capital(list_countries: list) -> Tuple[str, list]:
     random.shuffle(list_countries)
     quest =  f'''What's the capital of {list_countries[0]["name"]["common"]}'''
     answers = list(map(lambda a: a["capital"][0], list_countries[0:4]))
     return quest, answers
 
-def language(list_countries):
+# Creates the question and the possible answers for capital guessing an oficial language of a random country (the corretc answer is always the first value of the list answers)
+def language(list_countries: list) -> Tuple[str, list]:
     lang = []
     for data in list_countries:
-        try:
+        if "languages" in data.keys():
             for i in data["languages"].values():
                 if i not in lang:
                     lang.append(i)
-        except:
-            pass
-
     country = "Not defined"
-    while country == "Not defined":
+    while country == "Not defined": #selects a random country that has the key "languages"
         random.shuffle(list_countries)
-        try:
+        if "languages" in list_countries[0].keys():
             list_countries[0]["languages"]
             country = list_countries[0]["name"]["common"]
-        except:
-            pass
-    
     quest = f"Which of the following is an official language of {country}?"
     correct_answer = [random.choice(list(list_countries[0]["languages"].values()))]
-    list(map(lambda s: lang.remove(s), list_countries[0]["languages"].values()))
+    list(map(lambda s: lang.remove(s), list_countries[0]["languages"].values())) #  QUESTION: SI NO PONGO EL LIST AL PRINCIPIO NO SE EJECUTA, ES DECIR, LOS VALORES NO SE BORRAN
     other_answers = [others for others in lang[1:4]]
     answers = correct_answer + other_answers
     return quest, answers
 
-def car_side(list_countries):
+# Creates the question and the possible answers for capital guessing driving side of a random country (the corretc answer is always the first value of the list answers)
+def car_side(list_countries: list) -> Tuple[str, list]:
     country = "Not defined"
     while country == "Not defined":
         random.shuffle(list_countries)

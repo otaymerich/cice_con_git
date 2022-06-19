@@ -26,12 +26,18 @@ while user != "q":
             while flag != "y" and flag != "n":
                 flag = input("Do you want to download the flag (y/n): ").lower()
                 if flag == "y":
-                    if req.get(list(data["flags"].values())[0]): #Proteccion en caso que algun pais no tubiese bandera disponible
+                    if "flags" in data.keys():
                         flag_im =req.get(list(data["flags"].values())[0])
+                        print(type(flag_im))
                         img_format = list(data["flags"].keys())[0]
                         country = data["name"]["common"]
-                        bandera(country, flag_im, img_format)
-                        print(f'''{country} flag downloaded corretly''')
+                        bandera(country, flag_im, img_format)    
+                    # if req.get(list(data["flags"].values())[0]): #Proteccion en caso que algun pais no tubiese bandera disponible
+                    #     flag_im =req.get(list(data["flags"].values())[0])
+                    #     img_format = list(data["flags"].keys())[0]
+                    #     country = data["name"]["common"]
+                    #     bandera(country, flag_im, img_format)
+                    #     print(f'''{country} flag downloaded corretly''')
                     else:
                         print(f'''{country} has no flag available to download\n''')
         input("\nPress any to restart")
@@ -40,14 +46,14 @@ while user != "q":
         continent_choises(regions)  
         user_1 = input("Wich country do you want to play with?: ")
         if user_1.isnumeric() == False: #Validamos opcion elegida
-            print("Option not valid")
-            clear()
+            print("\nOption not valid")
             input("\nPress any to restart")
+            clear()
             continue
         if int(user_1) not in range(1,6):
-            print("Option not valid")
-            clear()
+            print("\nOption not valid")
             input("\nPress any to restart")
+            clear()
             continue
         continent = regions[int(user_1)-1]
         system("clear")
