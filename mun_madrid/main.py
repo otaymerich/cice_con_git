@@ -6,13 +6,13 @@ url = "https://datos.comunidad.madrid/catalogo/dataset/032474a0-bf11-4465-bb92-3
 res = req. get(url).json()
 data = res["data"]
 
-# obtener municipio por codigo INE
+# 1. obtener municipio por codigo INE
 def get_by_ine(ine):
     for mun in data:
         if mun["municipio_codigo_ine"] == ine:
             return mun
 
-# obtener el municipio más grande
+# 2. obtener el municipio más grande
 def mun_mayor():
     mun_mas_grande = None
     area = 0
@@ -22,15 +22,15 @@ def mun_mayor():
             area = mun["superficie_km2"]
     return mun_mas_grande
 
-# obtener superficie total
+# 3. obtener superficie total
 def sup_total():
     superficie = sum([mun["superficie_km2"] for mun in data])
     return superficie
 
 
 
-# densidad de poblacion total
-def dens_total(): #en realidad es densidad media (suma de densidades no tiene ningun sentido numerico)
+# 4. densidad de poblacion total
+def dens_total(): #en realidad es densidad media (suma de densidades no tiene ningun sentido matematico)
     superficie = 0
     habitantes = 0
     for mun in data:
@@ -38,14 +38,16 @@ def dens_total(): #en realidad es densidad media (suma de densidades no tiene ni
         habitantes += mun["superficie_km2"] * mun["densidad_por_km2"]
     return habitantes/superficie
 
-# obtener la población de Madrid
+# 5. obtener la población de Madrid
 def pob_madrid():
     superf_total = sup_total()
+    dens = mun_mayor()["densidad_por_km2"]
     data.remove(mun_mayor())
     sup_sin_madrid = sup_total()
-    return superf_total - sup_sin_madrid
+    sup_madrid = superf_total - sup_sin_madrid
+    return sup_madrid * dens
 
-# obtener poblacion media municipios
+# 6. obtener poblacion media municipios
 def pob_media():
     densidad = dens_total()
     superficie_total = sup_total()
@@ -53,7 +55,7 @@ def pob_media():
     return densidad * sup_media
 
 
-#comprovar ley de Benford
+# 7. comprovar ley de Benford
 def benford(numero): # primera opcion que hice
     num_list = []
     total_num = 0
@@ -103,15 +105,16 @@ def benford_4():
         else:
             provab[first_dig] = 100/len(data)
     return provab
-            
-        
 
+#VER EN GRAFICA
 # plt.style.use('_mpl-gallery')
 # fig, ax = plt.subplots()
 # ax.bar(range(1,10), benford_4().values(), width=1, edgecolor="white", linewidth=0.7)
 # plt.show()
-# # plt.savefig("charge.png")
+# plt.savefig("charge.png")
 
+
+#OTROS EJERCICIOS
 pob = sum(map(lambda dic: dic["densidad_por_km2"]*dic["superficie_km2"], data))
 # print(pob)
 
@@ -121,9 +124,16 @@ def count_pob(dic):
 pob_1 = sum(map(lambda dic: count_pob(dic), data))
 # print(pob_1)
 
-sor = sorted(data, key=lambda mun: mun["superficie_km2"], reverse=True)
-sor = sor[0:10]
-print(sor)
-print(len(sor))
+sor = sorted(data, key=lambda mun: mun["superficie_km2"], reverse=True)[0:10]
+# print(sor)
 dat = list(map(lambda sup: sup["superficie_km2"], sor))
-print(dat)
+# print(dat)
+
+def get_key(mun):
+    return mun["superficie_km2"]
+sor = sorted(data, key=get_key, reverse=True)[0:5]
+# print(sor)
+
+
+benford_grpah()
+
