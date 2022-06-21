@@ -54,7 +54,7 @@ def questions(question: str, answers: list, correct_answer: str) -> int:
         print(f'''{k}. {ans}''')
     player_guess = input("Answer: ")
     if player_guess.isnumeric(): #evaluamos respuesta usuario
-        if int(player_guess) in range(1,5):
+        if int(player_guess) in range(1,len(answers)+1):
             if answers[int(player_guess)-1] == correct_answer:
                 print("\nCorrect answer\n")
                 return 2
@@ -74,7 +74,6 @@ def result(points: int):
         print(f"Congrats you got {points}/10.")
     else:
         print(f"Dummy, you got {points}/10.")
-
 
 
 '''
@@ -135,7 +134,7 @@ def name(data: dict) -> str:
     return info
 
 # downloads the flag of the country in the dir flags
-def bandera(country: str, flag_im, img_format: str): #HOW TO SHOW REQUESTS TYPE
+def bandera(country: str, flag_im: req.Response, img_format: str): #HOW TO SHOW REQUESTS TYPE
     try: # creates the directory in case it dosen't exist
         mkdir(f"{CWD}/flags")
     except FileExistsError:
@@ -154,7 +153,7 @@ def numerical(list_countries: list, request: str) -> Tuple[str, list]:
     else:
         quest = "Whats the most populated country of the continent?"
     list_countries.sort(key=lambda list_countries: list_countries[request], reverse=True)
-    random_list = random.sample(range(1,int(len(list_countries)/2)),3)
+    random_list = random.sample(range(1,int(len(list_countries)/2)),3) #ordenamos lista por area o pobl, elegimos 3 paises random de la mitad superior de la lista ordenada para dificultar respuesta
     answers = [list_countries[0]["name"]["common"]]
     [answers.append(list_countries[q]["name"]["common"]) for q in random_list]
     return quest, answers
@@ -182,7 +181,7 @@ def language(list_countries: list) -> Tuple[str, list]:
             country = list_countries[0]["name"]["common"]
     quest = f"Which of the following is an official language of {country}?"
     correct_answer = [random.choice(list(list_countries[0]["languages"].values()))]
-    list(map(lambda s: lang.remove(s), list_countries[0]["languages"].values())) #  QUESTION: SI NO PONGO EL LIST AL PRINCIPIO NO SE EJECUTA, ES DECIR, LOS VALORES NO SE BORRAN
+    tuple(map(lambda s: lang.remove(s), list_countries[0]["languages"].values())) #  QUESTION: SI NO PONGO EL LIST AL PRINCIPIO NO SE EJECUTA, ES DECIR, LOS VALORES NO SE BORRAN
     other_answers = [others for others in lang[1:4]]
     answers = correct_answer + other_answers
     return quest, answers
@@ -203,6 +202,28 @@ def car_side(list_countries: list) -> Tuple[str, list]:
         return quest, answer
     answer = ["right", "left"]
     return quest, answer
+
+def telefon(list_countries: list) -> Tuple[str, list]:
+    country = "Not defined"
+    while country == "Not defined":
+        random.shuffle(list_countries)
+        if "idd" in list_countries[0].keys():
+            if "root" in list_countries[0]["idd"].keys() and "suffixes" in list_countries[0]["idd"].keys():
+                country = list_countries[0]["name"]["common"]
+    quest = f'''What number idd does this {country} has?'''
+    answer = [list_countries[0]["idd"]["root"] + list_countries[0]["idd"]["suffixes"][0]]
+    while len(answer) < 4:
+        for dic in list_countries[1:4]:
+            if "idd" in list_countries[0].keys():
+                if "root" in list_countries[0]["idd"].keys() and "suffixes" in list_countries[0]["idd"].keys():
+                    possible_answer = dic["idd"]["root"] + dic["idd"]["suffixes"][0] 
+                    if possible_answer not in answer:
+                        answer.append(possible_answer)
+    return quest, answer
+
+
+
+
 
 if __name__ == "__main__": #testing this file
     pass

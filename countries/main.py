@@ -1,6 +1,6 @@
 import requests as req
 from os import system
-from utils import car_side, exist_country, info, bandera, continent_choises, count_in_continent, numerical, questions, capital, clear, result, get_all, language
+from utils import car_side, exist_country, info, bandera, continent_choises, count_in_continent, numerical, questions, capital, clear, result, get_all, language, telefon
 from random import shuffle
 clear()
 
@@ -28,23 +28,17 @@ while user != "q":
                 if flag == "y":
                     if "flags" in data.keys():
                         flag_im =req.get(list(data["flags"].values())[0])
-                        print(type(flag_im))
                         img_format = list(data["flags"].keys())[0]
                         country = data["name"]["common"]
-                        bandera(country, flag_im, img_format)    
-                    # if req.get(list(data["flags"].values())[0]): #Proteccion en caso que algun pais no tubiese bandera disponible
-                    #     flag_im =req.get(list(data["flags"].values())[0])
-                    #     img_format = list(data["flags"].keys())[0]
-                    #     country = data["name"]["common"]
-                    #     bandera(country, flag_im, img_format)
-                    #     print(f'''{country} flag downloaded corretly''')
+                        bandera(country, flag_im, img_format)  
+                        print(f'''{country} flag downloaded corretly''') 
                     else:
                         print(f'''{country} has no flag available to download\n''')
         input("\nPress any to restart")
         clear()
     elif user == "2":
         continent_choises(regions)  
-        user_1 = input("Wich country do you want to play with?: ")
+        user_1 = input("Wich continent do you want to play with?: ")
         if user_1.isnumeric() == False: #Validamos opcion elegida
             print("\nOption not valid")
             input("\nPress any to restart")
@@ -59,10 +53,10 @@ while user != "q":
         system("clear")
         print(continent.center(50, "-"))
         list_countries = count_in_continent(continent)
-        quest_list=[numerical(list_countries, "area"), numerical(list_countries, "population"), capital(list_countries), language(list_countries), car_side(list_countries)]
+        quest_list=[numerical(list_countries, "area"), numerical(list_countries, "population"), capital(list_countries), language(list_countries), car_side(list_countries), telefon(list_countries)]
         shuffle(quest_list)
         points = 0
-        for i in quest_list: #Ejecutamos lista de funciones de preguntas
+        for i in quest_list[:-1]: #Ejecutamos lista de funciones de preguntas
             quest, answer = i
             correct_answer = answer[0]
             shuffle(answer)
