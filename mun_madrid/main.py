@@ -133,7 +133,3 @@ def get_key(mun):
     return mun["superficie_km2"]
 sor = sorted(data, key=get_key, reverse=True)[0:5]
 # print(sor)
-
-
-benford_grpah()
-

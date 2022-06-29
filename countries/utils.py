@@ -2,6 +2,8 @@ from os import mkdir, getcwd, stat, system
 import requests as req
 import random
 from typing import Union, Tuple
+from datetime import datetime
+from functools import wraps
 
 CWD = getcwd()
 url = "https://restcountries.com/v3.1"
@@ -12,12 +14,28 @@ def get_all() -> Tuple[list, str]:
     return res, url
 
 '''
+DECORATORS
+'''
+def outter_logs(func):
+    @wraps(func)
+    def inner_logs(*args):
+        date_info = datetime.now()
+        date_info = date_info.strftime("%Y-%m-%d %H:%M:%S")
+        with open(f"{CWD}/downloads.log", "a", encoding="utf8") as file:
+            file.write(f"{date_info} | {args[3]} |  {func.__name__}\n")
+        return(func(*args))
+    return inner_logs
+
+
+
+'''
 FRONT
 '''
 # limpiamos terminal manteniendo menu
 def clear(): 
     system("clear")
     menu()
+
 
 # imprime menu
 def menu():
@@ -134,7 +152,8 @@ def name(data: dict) -> str:
     return info
 
 # downloads the flag of the country in the dir flags
-def bandera(country: str, flag_im: req.Response, img_format: str): #HOW TO SHOW REQUESTS TYPE
+@outter_logs
+def bandera(country: str, flag_im: req.Response, img_format: str, user_name): #HOW TO SHOW REQUESTS TYPE
     try: # creates the directory in case it dosen't exist
         mkdir(f"{CWD}/flags")
     except FileExistsError:

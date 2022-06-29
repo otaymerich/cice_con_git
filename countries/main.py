@@ -20,6 +20,7 @@ while user != "q":
         data = exist_country(country)
         printing = info(data, country)
         if printing == False:
+            clear()
             pass
         else:
             flag = ""
